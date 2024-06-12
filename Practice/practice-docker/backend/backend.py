@@ -66,7 +66,7 @@ def writeVisit():
                 print(f"OperationalError when closing cursor: {e}")
         if conn:
             try:
-                conn.close()
+                conn.close() 
             except MySQLdb.OperationalError as e:
                 print(f"OperationalError when closing connection: {e}")
 
