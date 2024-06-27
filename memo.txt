@@ -3,11 +3,41 @@
 # 이미지 생성
 docker build .
 
-# 실행 중인 컨테이너 확인
+# 실행중인 컨테이너만 확인
+docker ps
+
+# 모든 컨테이너 확인
 docker ps -a
 
 # 컨테이너 중지
 docker stop 컨테이너name
 
 # 컨테이너 인터렉티브 접속
+# docker run ~ : 새 컨테이너를 만듬
 docker run -it node
+
+# 기존 컨테이너를 실행
+# docker run과는 다르게 컨테이너를 background로 실행함 <-> foreground
+# start는 detached가 디폴트, run은 attached가 디폴트
+# attached 하면 출력(print()) 결과를 수신할 수 있음
+# docker run 시, -d 인자는 detached 모드
+# docker start -a 컨테이너name으로 attach 가능
+docker start 컨테이너name
+
+# 컨테이너 attach
+docker attach 컨테이너id
+
+# 컨테이너 로그 출력
+# -f 인자로 계속 follow 할 수 있음
+docker logs 컨테이너id
+
+# 컨테이너 제거
+# 실행중인 컨테이너는 제거 불가
+docker rm 컨테이너name
+
+# 이미지 제거
+# 컨테이너에 포함된 이미지 제거 불가
+docker rmi 이미지id
+
+# 사용하지 않는 이미지 전부 제거
+docker image prune
