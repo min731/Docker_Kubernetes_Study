@@ -1,0 +1,13 @@
+# VS Code Docker Extension 설치하기
+
+# 이미지 생성
+docker build .
+
+# 실행 중인 컨테이너 확인
+docker ps -a
+
+# 컨테이너 중지
+docker stop 컨테이너name
+
+# 컨테이너 인터렉티브 접속
+docker run -it node
