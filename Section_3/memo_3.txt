@@ -49,3 +49,7 @@ docker run -d --rm -p 3000:80 --env PORT=8000 --name feedback-app -v feedback:/a
 
 # .env 파일로도 지정 가능
 docker run -d --rm -p 3000:80 --env-file ./.env --name feedback-app -v feedback:/app/feedback -v "C:/LJM/Docker_Kubernetes_Study/Section_3/data-volumes-04-added-nodemon:/app:ro" -v /app/temp -v /app/node_modules feedback-node:env
+
+# Dockerfile에 ARG 로 build 할때 인자를 추가할 수 있음
+ARG DEFAULT_PORT
+docker build -t 이미지명 --build-arg DEFAULT_PORT=8000 .
