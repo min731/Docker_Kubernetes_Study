@@ -12,8 +12,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.use('/feedback', express.static('feedback'));
 
-console.log('TEST')
-
 app.get('/', (req, res) => {
   const filePath = path.join(__dirname, 'pages', 'feedback.html');
   res.sendFile(filePath);
@@ -33,6 +31,8 @@ app.post('/create', async (req, res) => {
   const tempFilePath = path.join(__dirname, 'temp', adjTitle + '.txt');
   const finalFilePath = path.join(__dirname, 'feedback', adjTitle + '.txt');
 
+  console.log('TEST!!!!!');
+
   await fs.writeFile(tempFilePath, content);
   exists(finalFilePath, async (exists) => {
     if (exists) {
@@ -45,4 +45,7 @@ app.post('/create', async (req, res) => {
   });
 });
 
-app.listen(80);
+// app.listen(80);
+
+// 환경 변수로 포트 직접 지정
+app.listen(process.env.PORT); 
