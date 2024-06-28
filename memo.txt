@@ -40,4 +40,51 @@ docker rm 컨테이너name
 docker rmi 이미지id
 
 # 사용하지 않는 이미지 전부 제거
-docker image prune
+docker image prune -a
+
+# 중지한 컨테이너 자동 삭제
+docker run -p 3000:80 -d --rm 이미지id
+
+# 이미지 상세 내용 확인
+docker image inspect 이미지id
+
+# 로컬 머신 <-> 컨테이너로 파일 복사
+# 변경된 코드를 컨테이너로 전달 가능!
+# 컨테이너의 로그 파일을 가져올 수 있음!
+docker cp dummy/. 02252d244643:/test
+docker cp 02252d244643:/test dummy
+
+# 컨테이너에 이름 달기
+docker run -p 3001:80 -d --rm --name node_app 366e45f929cd
+
+# 이미지에 REPOSITORY, TAG 한번에 달기
+docker build -t node:240628 .
+
+# 도커 이미지 복사
+docker tag ypd04208625/goals_app:240628 ypd04208625/goals_app:240629
+ 
+# 도커 허브에 push
+docker push ypd04208625/goals_app:240629
+
+# 도커 허브 이미지 pull
+docker pull ypd04208625/goals_app:240629
+
+# 도커 볼륨 리스트
+# 익명 볼륨은 컨테이너가 삭제될 때 같이 삭제됌
+docker volume ls
+
+# -v : 컨테이너가 삭제되어도 볼륨을 유지
+# -v 볼륨이름:컨테이너볼륨경로
+docker run -d -p 3000:80 --rm --name feedback-app -v feedback:/app/feedback feedback-app:volumes
+# 이후 같은 -v 볼륨이름으로 docker run하면 같이 유지됌
+
+# 사용하지 않는 볼륨 삭제
+docker volume prune
+
+# 바인드 마운트를 통해 소스 코드 변경사항을 컨테이너에 전달할 수 있음
+# -v "%cd%":/app 로 해도됌
+docker run -d -p 3000:80 --rm --name feedback-app -v feedback:/app/feedback -v "C:/LJM/Docker_Kubernetes_Study/Section_3/data-volumes-03-adj-node-code:/app" feedback-app:volumes
+# 하지만 local 머신에는 npm install 하지 않아 오류
+docker run -d -p 3000:80 --name feedback-app -v feedback:/app/feedback -v "C:/LJM/Docker_Kubernetes_Study/Section_3/data-volumes-03-adj-node-code:/app" -v /app/node_modules feedback-app:volumes
+# 컨테이너의 /app/mode_modules를 공유하므로써 해결
+ 
