@@ -4,8 +4,14 @@ services:
     # Dockerfile이 있는 위치
     build: ./database
     # 내부에서 개방할 포트 : 외부에서 접근할 포트
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: visitlog
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker1234
     ports:
       - "3306:3306"
+      # - "3308:3306"
   backend:
     build: ./backend
     # 연결할 외부 디렉토리 : 컨테이너 내 디렉토리

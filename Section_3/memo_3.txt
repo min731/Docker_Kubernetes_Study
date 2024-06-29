@@ -1,0 +1,55 @@
+# 도커 볼륨 리스트
+# 익명 볼륨은 컨테이너가 삭제될 때 같이 삭제됌
+docker volume ls
+
+# -v : 컨테이너가 삭제되어도 볼륨을 유지
+# -v 볼륨이름:컨테이너볼륨경로
+docker run -d -p 3000:80 --rm --name feedback-app -v feedback:/app/feedback feedback-app:volumes
+# 이후 같은 -v 볼륨이름으로 docker run하면 같이 유지됌
+
+# 사용하지 않는 볼륨 삭제
+docker volume prune
+
+# 바인드 마운트를 통해 소스 코드 변경사항을 컨테이너에 전달할 수 있음
+# -v "%cd%":/app 로 해도됌
+docker run -d -p 3000:80 --rm --name feedback-app -v feedback:/app/feedback -v "C:/LJM/Docker_Kubernetes_Study/Section_3/data-volumes-03-adj-node-code:/app" feedback-app:volumes
+# 하지만 local 머신에는 npm install 하지 않아 오류
+docker run -d -p 3000:80 --name feedback-app -v feedback:/app/feedback -v "C:/LJM/Docker_Kubernetes_Study/Section_3/data-volumes-03-adj-node-code:/app" -v /app/node_modules feedback-app:volumes
+# 컨테이너의 /app/mode_modules를 공유하므로써 해결
+
+# anonymous volume, named volume, bind mount 3가지 종류가 있음
+# anonymous volume : 컨테이너 삭제 시, 같이 삭제 ex) docker run -v /app/data 혹은 Dockerfile ["/app/data"]
+# named volume : 컨테이너 삭제 시에도 유지, 다수 컨테이너에 연동 ex) docker run -v data:/app/data
+# bind mount : (*volume은 아님) 호스트 머신과 연동, 다수 컨테이너에 연동, 로컬 머신->컨테이너 방향 ez) docker run -v "C:/LJM:/app"
+
+# 컨테이너가 bind mount 경로를 read-only하게 하는 옵션
+docker run -d -p 3000:80 --name feedback-app -v feedback:/app/feedback -v "C:/LJM/Docker_Kubernetes_Study/Section_3/data-volumes-04-added-nodemon:/app:ro" -v /app/node_modules feedback-node:volumes
+# ro로 선언할지라도 -v가 정의되어있다면 더 구체적인 하위볼륨을 읽고 쓸 수 있음
+# 변경을 원하지 않는 경로는 ro, 내부 일부 경로를 -v 로 지정하여 읽고 쓰기 가능하게 할 수 있음
+docker run -d -p 3000:80 --name feedback-app -v feedback:/app/feedback -v "C:/LJM/Docker_Kubernetes_Study/Section_3/data-volumes-04-added-nodemon:/app:ro" -v /app/temp -v /app/node_modules feedback-node:volumes
+
+# 따로 볼륨을 생성할 수 있음
+docker volume create feedback-files
+# 이 named volume를 -v로 지정하여 컨테이너 실행 가능
+
+# volume 상세 내역, 볼륨 경로, ro 여부
+docker volume inspect 볼륨이름
+
+
+
+
+# .dockerignore 파일로, COPY 할때 제외할 파일을 지정할 수 있음 Dockerfile, .git 등등
+
+# Dockerfile에 ENV를 지정하고 이를 --env로 실행 가능
+ENV PORT 80
+EXPOSE $PORT
+#로 PORT 디폴트값을 지정하고
+docker run -d --rm -p 3000:80 --env PORT=8000 --name feedback-app -v feedback:/app/feedback -v "C:/LJM/Docker_Kubernetes_Study/Section_3/data-volumes-04-added-nodemon:/app:ro" -v /app/temp -v /app/node_modules feedback-node:env
+# --env로 자유롭게 포트 지정가능 
+
+# .env 파일로도 지정 가능
+docker run -d --rm -p 3000:80 --env-file ./.env --name feedback-app -v feedback:/app/feedback -v "C:/LJM/Docker_Kubernetes_Study/Section_3/data-volumes-04-added-nodemon:/app:ro" -v /app/temp -v /app/node_modules feedback-node:env
+
+# Dockerfile에 ARG 로 build 할때 인자를 추가할 수 있음
+ARG DEFAULT_PORT
+docker build -t 이미지명 --build-arg DEFAULT_PORT=8000 .
