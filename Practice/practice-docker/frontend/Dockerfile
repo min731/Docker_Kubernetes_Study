@@ -14,3 +14,4 @@ CMD ["http-server", "-p", "8080", "./public"]
 
 # 컨테이너 생성 & 실행 명령어
 # docker run --name {컨테이너명} -v $(pwd):/home/node/app -p 8080:8080 {이미지명}
+# -v : Volume (컨테이너와 특정 폴더를 공유함)

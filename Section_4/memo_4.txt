@@ -1,0 +1,24 @@
+# 컨테이너 <-> 외부 : axios 패키지 활용 외부 API 호출
+
+# 컨테이너 <-> 로컬 머신 : 로컬 호스트 머신의 mongo db와 통신
+# 컨테이너 입장에서 localhost가 아닌 host.docker.internal로 명시
+'mongodb://localhost:27017/swfavorites',
+'mongodb://host.docker.internal:27017/swfavorites',
+
+# 컨테이너 <-> 컨테이너
+docker run -d --name mongodb mongo
+docker container inspect mongodb
+# 해당 컨테이너의 IP 주소 찾기 "IPAddress": "172.17.0.2"
+'mongodb://172.17.0.2:27017/swfavorites'
+
+# 컨테이너 네트워크 만들기
+docker run --network 
+# 서로 통신할 수 있는 네트워크 정의
+docker network create favoirtes-net
+docker network ls
+# 데이터베이스 컨테이너는 보통 백엔드 컨테이너에서 호출하기 때문에
+# -p를 지정할 필요가 없음
+docker run -d --name mongodb --network favorites-net mongo 
+# 동일 --network라면 컨테이너 이름('mongodb')으로 타 컨테이너를 호출할 수 있음
+'mongodb://mongodb:27017/swfavorites'
+docker run --name favorites --network favorites-net -d -p 5000:3000 favorites-node 
