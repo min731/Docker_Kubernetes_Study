@@ -1,0 +1,45 @@
+# frontend, backend, database 컨테이너 연동
+
+# database 도커화
+docker run --name mongodb --rm -d -p 27017:27017 mongo 
+
+# backend 도커화
+docker run --name goals-backend -p 80:80 -d goals-node 
+
+# frontend 도커화
+docker run --name goals-frontend -p 3000:3000 -d goals-react
+
+# network 활용 통신하기
+docker network create goals-net
+
+# database
+docker run --name mongodb --rm -d --network goals-net mongo
+
+# backend
+'mongodb://mongodb:27017/course-goals',
+docker run --name goals-backend --rm -d --network goals-net goals-node
+
+# frontend
+'http://goals-backend/goals'
+docker run --name goals-frontend --rm -d -p 3000:3000 --network goals-net goals-react
+# react는 컨테이너에서 실행되는 것이 아닌 브라우저에서 런타임으로 실행됌!
+# 브라우저는 goals-backend를 모름!
+'http://localhost/goals'
+
+
+
+
+# *named volume을 통해 데이터 영구 저장
+# *mongo container는 /data/db에 저장됌
+docker run --name mongodb -d -v data:/data/db --network goals-net mongo
+# volume에 영구 저장되어 있기 때문에, 컨테이너를 삭제해도 남아있음 
+
+
+# mongodb 데이터 엑세스 관리
+# -e MONGODB_INITDB_ROOT_USERNAME 추가
+# -e MONGODB_INITDB_ROOT_PASSWORD 추가
+docker run --name mongodb -d -v data:/data/db -e MONGO_INITDB_ROOT_USERNAME=max -e MONGO_INITDB_ROOT_PASSWORD=secret --network goals-net mongo
+# backend 로직에 MONGO_INITDB_ROOT_USERNAME=max, MONGO_INITDB_ROOT_PASSWORD=secret 을 기입해야함!
+'mongodb://max:secret@mongodb:27017/course-goals?authSource=admin'
+docker build -t goals-node .
+docker run --name goals-backend -d -e MONGO_INITDB_ROOT_USERNAME=max -e MONGO_INITDB_ROOT_PASSWORD=secret -p 80:80 --network goals-net goals-node
