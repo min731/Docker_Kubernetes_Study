@@ -43,3 +43,15 @@ docker run --name mongodb -d -v data:/data/db -e MONGO_INITDB_ROOT_USERNAME=max 
 'mongodb://max:secret@mongodb:27017/course-goals?authSource=admin'
 docker build -t goals-node .
 docker run --name goals-backend -d -e MONGO_INITDB_ROOT_USERNAME=max -e MONGO_INITDB_ROOT_PASSWORD=secret -p 80:80 --network goals-net goals-node
+
+
+
+# log 저장 volume
+# 바인드 마운트(소스 코드 전체)
+# 모듈은 바인드 마운트 제외 
+docker run --name goals-backend -v logs:/app/logs -v C:/LJM/Docker_Kubernetes_Study/Section_5/multi-01-starting-setup/backend:/app -v /app/node_modules -d -p 80:80 --network goals-net goals-node
+
+# .dockerignore 활용 COPY 제외 파일 지정
+node_modules
+Dockerfile
+.git

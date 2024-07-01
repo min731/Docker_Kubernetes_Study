@@ -28,6 +28,9 @@ app.use((req, res, next) => {
 
 app.get('/goals', async (req, res) => {
   console.log('TRYING TO FETCH GOALS');
+  
+  console.log('Check Nodemon!!!!!!!!!!!!!')
+  
   try {
     const goals = await Goal.find();
     res.status(200).json({
@@ -90,11 +93,11 @@ mongoose.connect(
   // 'mongodb://host.docker.internal:27017/course-goals',
 
   // --network 활용 타 컨테이너 db 연결
-  // 'mongodb://mongodb:27017/course-goals',
+  'mongodb://mongodb:27017/course-goals',
 
   // MONGO_INITDB_ROOT_USERNAME, MONGO_INITDB_ROOT_PASSWORD
   // 형식 mongodb+srv://[username:password@]host[/[defaultauthdb][?options]]
-  'mongodb://max:secret@mongodb:27017/course-goals?authSource=admin',
+  // 'mongodb://max:secret@mongodb:27017/course-goals?authSource=admin',
   // 'mongodb://max:secret@mongodb:27017/course-goals',
 
   {
