@@ -1,0 +1,68 @@
+version: "3.8" # docker compose 버전, docker engine 사양 확인, 공식 문서 확인
+services: # 아래줄 부터 두번 빈칸 (하위) , -a, --rm은 default
+  mongodb: # 아래줄 두번 공백
+    image: 'mongo'
+    volumes:
+      - data:/data/db
+    # environment: # -e 환경 변수 
+      # MONGO_INITDB_ROOT_USERNAME:max
+
+      # - MONGO_INITDB_ROOT_USERNAME=max
+      # - MONGO_INITDB_ROOT_PASSWORD=secre
+    container_name: mongodb # 컨테이너 이름 지정
+    env_file: # env 파일로도 정의 가능
+      - ./env/mongo.env
+    # docker-compose 한다면 이미 동일한 네트워크로 지정하지 않아도 됌
+    # networks:
+      # - goals-net
+
+  backend:
+    # image: 'goals-node' # 따로 이미지를 빌드하지 않아도 build 옵션으로 자동으로 빌드 
+    build: ./backend 
+    # 아래 형태도 가능
+    # build:
+      # context: ./backend # 이미지가 참조하는 모든 경로, 외부 경로를 참조할 때도 있음
+      # dockerfile:  Dockerfile # 도커파일 형식 지정가능
+      # args:
+        # some-arg:1
+    ports:
+      - '80:80' # host:internal port
+    volumes:
+      - logs:/app/logs # named volume
+      - ./backend:/app # docker-compose에서는 바인드 마운트를 상대경로로 지정할 수 있음
+      - /app/node_modules # anonymous volume
+    container_name: goals-backend
+    env_file:
+      - ./env/backend.env
+    depends_on: # docker run에 없는 옵션, backend 컨테이너는 database 컨테이너에 의존, database 컨테이너를 먼저 실행하고자 지정
+      - mongodb # 의존 container명 지정
+  
+  frontend: # -it 옵션이 필요
+    build: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend/src:/app/src # 바인드 마운트
+    container_name: goals-frontend
+    # -it
+    stdin_open: true 
+    tty : true 
+    # -d 모드에서도 입력 수신 가능
+    depends_on:
+      - backend
+    environment:
+      - NODE_OPTIONS=--openssl-legacy-provider
+
+# 사용하는 named volume 정의
+# 여러 컨테이너가 사용할 수 있게하기 위함
+# anonymous volume, bind mount는 필요없음
+volumes:
+  data:
+  logs:
+
+# 실행 명령어
+# docker-compose up
+# 여러 컨테이너 각각 생성 및 실행
+
+# 종료,삭제 명령어
+# docker-compose down

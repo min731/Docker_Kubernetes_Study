@@ -1,0 +1,18 @@
+# docker compose
+다시 docker build, run, start, stop 한번에 실행
+Dockerfile과 함께 작동, 대체하는 것은 아님
+
+# Service
+다중 컨테이너를 구성하는 것
+포트, 환경 변수, 볼륨, 네트워크 정의
+
+# 실행 명령어
+docker-compose up
+# 코드 수정 후, 이미지 리빌드만 강제(자체 이미지), 컨테이너를 실행하지는 않음
+docker-compose up build
+
+
+# 종료,삭제 명령어
+docker-compose down
+# volume 포함 삭제
+docker-compose down -v
