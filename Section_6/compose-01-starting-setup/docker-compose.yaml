@@ -50,8 +50,8 @@ services: # 아래줄 부터 두번 빈칸 (하위) , -a, --rm은 default
     # -d 모드에서도 입력 수신 가능
     depends_on:
       - backend
-    environment:
-      - NODE_OPTIONS=--openssl-legacy-provider
+    # environment:
+      # - NODE_OPTIONS=--openssl-legacy-provider
 
 # 사용하는 named volume 정의
 # 여러 컨테이너가 사용할 수 있게하기 위함
