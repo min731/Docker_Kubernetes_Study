@@ -58,7 +58,7 @@ minikube status
 
 # 로컬 머신에서 쿠버네티스 클러스터로 명령을 보냄
 kubectl help
-# 새 Deployment 객체 생성(명령형 방식)(자동으로 쿠버네티스 클러스터로 전송됌)
+# 새 Deployment 객체 생성(명령형 방식)(자동으로 쿠버네티스 클러스터(master node)로 전송됌)
 kubectl create deployment first-app --image=kub-first-app
 
 # 작동 후, deployment 객체 확인, 준비되지 않음
@@ -79,3 +79,71 @@ kubectl get deployments
 kubectl get pods
 # 확인
 kubectl dashboard 
+
+------------------------------------------------------------------------------------ 
+
+# master node의 schedule가 pod에게 적합한 node를 찾음
+# worker node는 kubelet으로 pod, container를 관리
+
+# Service 객체(object)는 pod와 pod, 혹은 외부에서 pod를 노출시킴
+# Service없이 deployment했을 때 pod의 IP 주소가 있지만,
+# 외부에서 엑세스할 수는 없음, 또한 pod가 교체될때마다 바뀜
+# Service는 pod를 그룹화하고 공유IP를 제공함,
+# 이를 통해 클러스터 내부 뿐만아니라 외부에서도 액세스할 수 있음
+
+# Service 객체 만들기, deployment를 노출(expose)하기
+# type=ClusterIP(클러스터 내부에서만 통신)
+# type=Nodeport(실행 중인 워커 노드의 IP 노출, 외부와 통신 가능)
+# type=LoadBalancer(Service에 고유한 주소 생성, 트래픽 분산)
+# --port 컨테이너의 노출 포트(노출할 포트와 함께)
+kubectl expose deployment first-app --type=LoadBalancer --port 8080
+kubectl get services
+# 클러스터 내부 통신이 가능한 CLUSTER-IP는 보이지만, 외부IP는 안보임
+# 가상화시켜 구현하고 있기 때문에 EXTERNAL-IP는 없음
+# 하지만 minikube에는 Service를 액세스할 수 있게하는 명령어가 있음
+minikube service first-app
+
+# 현재 어플리케이션은 /error 시, 서버를 중지하고 있음
+# 이를 요청한 뒤, 기다리면 서버가 다시 실행됌
+kubectl get pods
+# RESTARTS를 보면됌 or minikube dashboard
+
+# 오토 스케일링
+kubectl scale deployment/first-app --replicas=3
+kubectl get pods
+# 하나의 pod가 죽으면, 다른 pod로 분산
+
+# 다른 deployment로 롤백
+# 소스 코드 수정
+# 새 이미지 생성, 도커 허브 push
+kubectl get deployments
+# deployment 객체에 새 이미지 주입
+# kubectl set image deployment객체 컨테이너명=새이미지명
+kubectl set image deployment/first-app kub-first-app=ypd04208625/kub-first-app
+# 다시 롤백하고 싶다면?
+kubectl rollout status deployment/first-app
+
+# 존재하지 않는 이미지를 주입한다면?
+kubectl set image deployment/first-app kub-first-app=ypd04208625/kub-first-app:tmp
+kubectl rollout status deployment/first-app
+# Waiting for... (dashboard 상에서는 pod에 문제가 생김)
+# 새 pod가 실행되기 전에는 이전 pod를 종료하지 않음!
+kubectl get pods 
+# ImagePullBackOff 중인 pod 존재, 이를 롤백
+kubectl rollout undo deployment/first-app
+# ImagePullBackOff 중인 pod 제거
+# 이전의 deployment 버전 보기
+kubectl rollout history deployment/first-app
+kubectl rollout history deployment/first-app --revision=3
+
+# 특정 버전의 deployment로 돌아가기(두번째)
+kubectl rollout undo deployment/first-app --to-revision=2
+
+# Service 제거
+kubectl delete service first-app
+# Deployment 제거
+------------------------------------------------------------------------------------ 
+
+# docker-compose로 여러 컨테이너마다 docker run 할때 번거로움을 완화했듯이
+# 선언적 접근방식으로 명령적(kubectl) 접근방식을 완화시킬 수 있음
+
