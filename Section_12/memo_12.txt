@@ -147,3 +147,14 @@ kubectl delete service first-app
 # docker-compose로 여러 컨테이너마다 docker run 할때 번거로움을 완화했듯이
 # 선언적 접근방식으로 명령적(kubectl) 접근방식을 완화시킬 수 있음
 
+# 명령적 접근(Imperative), 선언적 접근(Declarative)
+kubectl create deployment , kubectl apply -f config.yaml 
+
+# pods,deployments,services 다 제거
+# deployment.yaml 추가
+# deployment, service 등을 정의
+kubectl apply -f=deployment.yaml
+# selector를 지정하지 않아 오류, 선언적 접근은 selector를 지정해야함
+# deployment는 selector(matchLabels, matchExpressions)로 제어할 pod를 선택함
+# selector 선언 후 
+kubectl apply -f=deployment.yaml
