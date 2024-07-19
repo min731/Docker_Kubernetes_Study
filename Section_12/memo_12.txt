@@ -158,3 +158,39 @@ kubectl apply -f=deployment.yaml
 # deployment는 selector(matchLabels, matchExpressions)로 제어할 pod를 선택함
 # selector 선언 후 
 kubectl apply -f=deployment.yaml
+
+# service.yaml 추가
+kubectl apply -f=service.yaml
+# minikube에 서비스 노출
+minikube service backend
+
+# replicas 변경 적용 방법
+# deployment.yaml의 replicas 변경 후
+kubectl apply -f=deployment.yaml
+# 이미지도 동일하게 변경가능
+
+# 명령적 접근으로 deployment delete 가능
+# 파일을 삭제하는 것이 아닌 리소스들을 삭제하는 것
+kubectl delete -f=deployment.yaml -f=service.yaml
+kubectl delete -f=deployment.yaml,service.yaml 
+
+# 여러 yaml 파일들 한번에 적용 및 관리
+# service,deployment 모두 선언된 master-deployoment.yaml 작성
+# 기존 service, deployment 삭제 이후, master-deployment 적용
+kubectl apply -f=master-deployment.yaml
+# service, deployment 한번에 적용
+
+# deployment.yaml의 matchLabels vs matchExpressions
+# matchExpressions은 operator(연산자) 활용 Label 표현
+
+# selector를 활용하여 delete할 수도 있음
+kubectl delete deployments,services -l 키=값(metadatam-labels)
+
+-------------------------------------------------------------------
+
+# pod, container가 정상인지 여부 확인
+# deployment3.yaml에 livenessProbe 추가
+
+# imagePullPolicy로 항상 최신 image를 가져오도록 수정 가능
+# 같은 태그로 재실행 해도 최신 image로 수정됌
+# deployment3.yaml 확인

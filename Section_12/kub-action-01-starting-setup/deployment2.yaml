@@ -8,6 +8,9 @@ spec: #
     matchLabels: # deployment가 제어할 pod를 Label들
       app: second-app
       tier: backend
+    # matchExperssions: # 연산자로 표현 가능, 표현 방식이 다름
+      # - {key: app, operator: In, values: [second-app, first-app]}
+      # - {key: app, operator: NotIn, values: [second-app, first-app]}
   template: # 사용할 이미지
     metadata: # pod는 또다른 객체이기 때문에 metadata 지정
       labels: 
