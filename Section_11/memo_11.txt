@@ -49,4 +49,3 @@ Cloud-Controller-Manager : AWS, Azure
 노드 : 여러개 포드를 호스팅, 클러스터와 통신, 가상 머신
 파드 : 컨테이너를 실행(docker run)
 서비스 : 논리적 세트, 독립적인 IP 주소를 갖는 포드 그룹
-

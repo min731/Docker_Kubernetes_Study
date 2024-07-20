@@ -82,12 +82,12 @@ kubectl dashboard
 
 ------------------------------------------------------------------------------------ 
 
-# master node의 schedule가 pod에게 적합한 node를 찾음
+# master node의 scheduler가 pod에게 적합한 node를 찾음
 # worker node는 kubelet으로 pod, container를 관리
 
 # Service 객체(object)는 pod와 pod, 혹은 외부에서 pod를 노출시킴
 # Service없이 deployment했을 때 pod의 IP 주소가 있지만,
-# 외부에서 엑세스할 수는 없음, 또한 pod가 교체될때마다 바뀜
+# 외부에서 액세스할 수는 없음, 또한 pod가 교체될때마다 바뀜
 # Service는 pod를 그룹화하고 공유IP를 제공함,
 # 이를 통해 클러스터 내부 뿐만아니라 외부에서도 액세스할 수 있음
 
