@@ -1,0 +1,56 @@
+# volume
+# Persistent Volumes, Persistent Volumes Claims
+
+# node 앱 띄우기
+docker-compose up -d --build
+docker-compose down
+docker-compose up -d --build
+# 컨테이너를 삭제했더라도 volume은 살아있음
+
+--------------------------------------------------------
+
+# State : 잃어서는 안되는 데이터, 사용자 데이터들 ...
+# 컨테이너 재시작에도 살아있어야함
+
+# 쿠버네티스가 volume을 pod에 탑재할 수 있음(pod template에 추가)
+# 'Local Volume'(Node에 저장), 'Cloud provider specific Volume'
+# pod가 제거되면 pod안 volume도 제거됌 -> 해결할 방법 있음
+# 쿠버네티스 volume은 위치를 완벽히 제어할 수 있음(Docker volume과 다르게)
+# 컨테이너가 제거 및 재시작되어도 volume이 유지된다는 점은 k8s,docker 모두 같음
+
+--------------------------------------------------------
+
+# deployment.yaml, service.yaml 작성 후
+kubectl apply -f=service.ymal,deployment.yaml
+kubectl get deployments
+kubectl get services
+# service.yaml type을 LoadBalancer로 수정 후 다시 적용
+kubectl apply -f=service.yaml
+# LoadBalancer 타입으로 수정됌
+
+# 컨테이너의 get,post 요청 가능 확인
+
+--------------------------------------------------------
+# 쿠버네티스 볼륨 구현
+# 경로를 지정할 수 있으며, 컨테이너 외부에서 작동
+# 쿠버네티스 볼륨 유형, 드라이버가 다름
+# 쿠버네티스 볼륨은 Pod 안에 있음 
+# deployment.yaml의 pod spec에 volume 정의
+# app.js 수정(/error), 새 deployment.yaml 적용 (이미지:1 버전)
+kublectl apply -f=deployment.yaml
+
+# 컨테이너가 수정되어 다시 시작되면 volume 사라짐
+# 볼륨을 pod에 연결!
+
+# deployment.yaml의 pod spec에 volume 정의
+# k8s volume 이름/타입 정의, container의 mountPath/이름 정의
+kubectl apply -f=deployment.yaml
+# 컨테이너가 재시작 되어도 volume이 유지됌
+
+--------------------------------------------------------
+# emptyDir + 다수 replicas 경우 , 각 replicas 별로 volume이 다름
+# 한 pod가 재시작되는 동안 다른 pod로 요청했을 시 volume이 상이할 수 있음
+# hostPath volume으로 해결 가능
+# hostPath volume, 경로(/data), DirectoryOrCreate 수정, deployment.yaml 적용
+# 여러 pod의 volume을 동기화 시킬 수 있음
+# 단 동일한 노드의 pod만 이 데이터에 동기화할 수 있음  
