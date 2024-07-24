@@ -54,3 +54,54 @@ kubectl apply -f=deployment.yaml
 # hostPath volume, 경로(/data), DirectoryOrCreate 수정, deployment.yaml 적용
 # 여러 pod의 volume을 동기화 시킬 수 있음
 # 단 동일한 노드의 pod만 이 데이터에 동기화할 수 있음  
+
+--------------------------------------------------------
+
+# CSI volume(Container Storage Interface)
+# Amazon Elcastic File System 과 같은 서비스를 스토리지 솔루션으로 추가할 수 있음
+
+ -------------------------------------------------------
+
+# emptyDir은 Pod간 동기화가 안될 수 있음
+# hostPath는 노드간 동기화가 안될 수 있음
+# minikube은 단일 워커 노드이기 때문에 hostPath로는 일단 가능
+# aws ElcasticBlockStore, AzuerFile, AzuerDisc
+# 로 k8s 상의 영구 볼륨을 생성할 수도 있음
+
+# k8s 상에서 Pod의 수명 주기와 분리되는 Persistent volume이 있음
+# 노드에 독립적임
+# 클러스터 안에 노드들과는 분리된 PV(Persistent Volume)이 존재(리소스 할당)
+# 각 노드안에 PV Claim (Persistent Volume Claim)을 정의하여 PV에 액세스
+# 각 노드는 여러 PV에 액세스 할 수 있음
+# host-pv.yaml 작성
+
+# 이후 PV를 사용할 수 있는 PV Claim 작성
+# host-pvc.yaml를 작성하고 Pod에 적용하기 위해 deployment2.yaml 로 작성
+
+# default Storage Class 확인
+# 해당 default SC(Storage Class)를 사용할 것임
+kubectl get sc 
+# host-pv.yaml, host-pvc.yaml에 storageClassName 추가
+kubectl apply -f=host-pv.yaml,host-pvc.yaml,deployment2.yaml
+kubectl get pv
+kubectl get pvc
+kubectl get deployments
+
+# postman 요청으로 확인
+# 단일 워커 노드이기 때문에 hostPath와 PV는 동일하지만
+# 이는 클러스터 상의 PV가 구현된 것임
+
+--------------------------------------------------
+
+# 쿠버네티스 환경변수
+# app.js의 volume 경로에 process.env.STORY_FOLDER 변수 추가
+# deployment2.yaml 파일에 env 명시
+# app.js를 수정했으므로 image 재제작
+# :2 로 build, push
+kubectl apply -f=deployment2.yaml
+
+# 다른 deployment도 동일한 환경변수를 사용할 수 있게 통합
+# emvironment.yaml 작성(꼭 이러한 이름이 아니여도 됌)
+# kind는 ConfigMap
+# environment.yaml 작성, deployment3.yaml에 적용
+kubectl apply -f=environment.yaml,deployment3.yaml

@@ -6,7 +6,9 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-const filePath = path.join(__dirname, 'story', 'text.txt');
+// 쿠버네티스 환경 변수 활용
+// const filePath = path.join(__dirname, 'story', 'text.txt');
+const filePath = path.join(__dirname, process.env.STORY_FOLDER , 'text.txt');
 
 app.use(bodyParser.json());
 

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim # PVC
+metadata:
+  name: host-pvc
+spec: # 정의한 PV를 연결해주어야함
+  volumeName: host-pv # PV의 metadata name을 입력
+  storageClassName: standard # default SC 활용
+  accessModes:
+    - ReadWriteOnce # 지원되는 PV의 accessModes 입력
+  resources: # PV의 capacity에 대응, 얻고자하는 리소스 정의
+    requests:
+      storage: 1Gi # 더 적게 요청할 수도 있음,
+                   # 동일 PV에 여러 Claim이 있을 경우 더 적게 요청
+
+    

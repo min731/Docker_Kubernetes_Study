@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: story-deployment
+spec:
+  # replicas: 1
+  replicas: 2
+  selector:
+    matchLabels:
+      app: story
+  template: #pod template
+    metadata:
+      labels:
+        app: story
+    spec:
+      containers:
+        - name: story
+          # 쿠버네티스 ConfigMap활용 
+          # image: ypd04208625/kub-data-demo:1
+          image: ypd04208625/kub-data-demo:2
+          env: # 쿠버네티스 ConfigMap활용 deployment3.yaml 파일 작성
+            - name: STORY_FOLDER # 이 변수는 app.js에 존재
+              # value: 'story'
+              valueFrom:
+                configMapKeyRef: # 어떤 configMap인지 
+                  name: data-store-env
+                  key: folder # 해당하는 키 입력
+          volumeMounts: # k8s 볼륨을 컨테이너에 마운트
+            - mountPath: /app/story # 컨테이너 내부의 경로(본 예제에서는 story의 text.text)
+                                    # docker-compose에 이미 경로를 명시했음
+              name: story-volume  
+      volumes:
+        - name: story-volume # 이름 사용자 정의
+          # emptyDir: {} # 볼륨 타입, Pod가 살아있는 한 해당 경로를 유지,
+                       # 컨테이너가 재사용 가능
+                       # 컨테이너에 바인딩 해야함
+          
+          # hostPath:
+          #   path: /data # 데이터가 저장되는 호스트 머신의 경로, docker bind mount와 유사
+          #   type: DirectoryOrCreate # 존재하지 않는 다면 생성
+
+          persistentVolumeClaim:
+            claimName: host-pvc # PVC(Persistent Volume Claim) 이름 명시 

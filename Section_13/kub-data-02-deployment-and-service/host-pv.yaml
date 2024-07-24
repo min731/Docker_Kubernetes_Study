@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume # PV 정의
+metadata:
+  name: host-pv # 사용자가 정의
+spec:
+  capacity: #
+    storage: 1Gi
+  volumeMode: Filesystem # Filesystem or Block
+  storageClassName: standard # default SC 활용
+  accessModes:
+    - ReadWriteOnce # 단일 노드만 읽고 쓰기 가능, hostpath는 이것만 사용 가능
+    # - ReadOnlyMany # 여러 노드가 읽기 가능  
+    # - ReadWriteMany # 여러 노드가 읽고 쓰기 가능
+  hostPath: # hostPath이기 때문에 노드에 독립적이진 않지만 현재 워커 노드는 1개로 이므로 가능
+    path: /data
+    type: DirectoryOrCreate
