@@ -1,0 +1,59 @@
+# K8S Networking
+# Pod 내부의 컨테이너간 통신, Pod와 Pod의 통신
+# 동일 클러스터 안의 Users API, Auth API는 동일 Pod안에서 내부 통신
+# Tasks API는 다른 Pod에서 통신
+# 클라이언트는 Users API, Taks API로 접근 가능
+
+# task-api의 tasks/tasks.txt 파일 생성 후
+# Dockerfile에 COPY /tasks . 레이어 추가
+# 이후 login(GET), tasks(POST,GET) API 테스트
+
+# users-api 어플리케이션만 k8s 상에서 개별 실행하기 위해 수정
+# image 제작 및 Push
+# kubernetes라는 폴더로 yaml파일 정리
+# users-deployment.yaml 작성 및 apply
+
+---------------------------------------------------------
+
+# users-api만 배포하기 위해 service 생성
+# service: 고정 IP 제공, 외부 접근 가능
+# users-service.yaml 작성 및 적용
+# k8s 상에서 users-api 호출 확인
+# auth-api와 users-api 통신을 위한 users-api 어플리케이션 수정
+# 이미지 제작 및 새로 push 
+
+# docker-compose 파일 환경변수(process.env.AUTH_ADDRESS)를 활용하여 수정
+# auth-api 이미지 제작 및 push
+# deployment.yaml 작성
+# 단, users-api와 동일 pod 이기 때문에 동일 deployment.yaml에 작성(새 컨테이너만 추가)
+# users-deployment2.ymal
+# image 이름들 뒤에 :lastest 추가! (k8s가 업데이트하도록 인식)
+
+# auth-api는 users-api에 의해서만 작동하면 되기 때문에 포트 노출 X
+# service.ymal은 그대로
+
+# K8S에서 동일 POD안의 컨테이너는 localhost로 통신함
+# users-deployment2.yaml에서 컨테이너의 env.AUTH_ADDRESS를 localhost로 설정
+kubectl apply -f=users-deployment2.yaml
+# 동일 Pod 내의 users-api, auth-api 통신 확인
+
+----------------------------------------------------------
+
+# 최종적으로 auth-api, users-api, tasks-api 각 Pod가 통신하는 것이 목표
+# 또 auth-api는 서비스에 노출되면 안되기 때문에 다수 service를 구축
+
+# 일단, auth-deployment.yaml / users-deployment3.ymal 각각 작성
+# auth를 다른 pod로 분리했기 떄문에 개별 service 필요
+# auth-service.yaml은 클러스터 외부가 아닌 내부만 노출할 것이기 때문에 ClusterIP
+# 또한 auth가 타 POD이 때문에 users-deployment3.yaml의 env.AUTH_ADDRESS는 
+# auth-service.yaml를 적용한 ClusterIP임! 이는 고정임! 이를 users-deployment3.yaml의 env.AUTH_ADDRESS 에 적용
+kubectl apply -f=auth-service.yaml
+kubectl get services
+# ex) 10.106.27.113
+# users-deployment3.yaml에 적용
+# login, signup 호출 확인
+
+# 위 service의 ClusterIP를 직접 기입할 수도 있지만
+# service name 으로 users 어플리케이션단에서 직접 
+# ${process.env.AUTH_SERVICE_SERVICE_HOST} 할당할 수도 있음
+# 또한 dokcer-compose 파일에도 기입해야함

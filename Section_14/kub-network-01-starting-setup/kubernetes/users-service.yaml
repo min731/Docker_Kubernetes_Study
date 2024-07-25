@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-service
+spec: # 어떤 부분이 service의 일부인지, 어떤 포트인지, 어떤 service 유형인지
+  selector: # 어떤 pod를 선택할 것인지
+    app: users
+  type: LoadBalancer # default는 ClusterIP
+  ports: 
+    - protocol: TCP
+      port: 8080 # 이는 자유
+      targetPort: 8080 # 컨테이너는 8080을 받고 있어서 반드시 8080

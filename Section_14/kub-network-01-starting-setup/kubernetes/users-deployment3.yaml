@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users # tempalte label과 매칭
+  template:
+    metadata:
+      labels:
+        app: users
+    spec:
+      containers:
+        - name: users
+          image: ypd04208625/kub-demo-users:latest
+          env:
+            - name: AUTH_ADDRESS
+              # value: localhost
+              value: "10.106.27.113" # auth-api가 타 Pod로 분리되면서
+                                     # ClusterIP 주소로 할당

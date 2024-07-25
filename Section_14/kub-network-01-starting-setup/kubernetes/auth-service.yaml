@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  selector:
+    app: auth # auth-deployment.yaml Label 대로 
+  type: ClusterIP # auth를 공개적으로 노출할 것이 아니기 떄문에
+                  # 클러스터 내부에서만 접근
+                  # 이에 따라 users-deployment3.ymal의 env.AUTH_ADDRESS 수정
+                  # 
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
