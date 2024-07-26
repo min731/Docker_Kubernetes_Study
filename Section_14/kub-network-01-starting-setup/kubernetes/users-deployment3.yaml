@@ -18,5 +18,6 @@ spec:
           env:
             - name: AUTH_ADDRESS
               # value: localhost
-              value: "10.106.27.113" # auth-api가 타 Pod로 분리되면서
+              # value: "10.106.27.113" # auth-api가 타 Pod로 분리되면서
                                      # ClusterIP 주소로 할당
+              value: "auth-service.default" # 서비스명.네임스페이스명

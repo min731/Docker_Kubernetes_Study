@@ -57,3 +57,59 @@ kubectl get services
 # service name 으로 users 어플리케이션단에서 직접 
 # ${process.env.AUTH_SERVICE_SERVICE_HOST} 할당할 수도 있음
 # 또한 dokcer-compose 파일에도 기입해야함
+
+------------------------------------------------------------
+
+# users-deployment3.yaml ClusterIP 대신 service Name자체를 입력하여 연결할 수 있음
+# value: "auth-service.default", (서비스명.네임스페이스명) users-deployment3.yaml 수정
+# 쿠버네티스 내장 CoreDNS 기능에 의해 작동
+
+# 네임스페이스 확인
+kubectl get ns
+
+------------------------------------------------------------
+
+# task-api 개별 pod 까지 통신
+# auth-api에 요청하는 코드가 포함된 어플리케이션
+# task-api에서 auth에 요청하는 방법은 크게 3가지
+# (1) docker-compose 환경변수, (2) K8S ClusterIP 환경변수, (3) K8S CoreDNS(서비스명.네임스페이스명) 할당
+
+# task-api는 개별 Pod로 구성되며 외부에서 접근이 가능한 service
+# tasks-deployment.yaml , tasks-service.yaml 작성 후 적용
+
+# task Pod가 실행이 안됌-> 기존 docker-compose 상에서 활용한
+# 환경변수가 K8S 상(deployment)에서 없음, 이를 기재
+# name: TASKS_FOLDER, value: "task"
+# 외부 요청을 받는 서비스는 minikube serivce 서비스명으로 실행
+# minikube serivce tasks-service
+
+------------------------------------------------------------
+
+# frontend 어플리케이션 추가
+# frontend 어플리케이션에 task-api service 주소로 변경후 
+# 이미지 빌드 및 시작
+# 쿠버네티스와 상관없이 로컬에서 구동되는 컨테이너
+# 로컬 프론트엔드 어플리케이션을 통해 K8S를 작동
+docker run -p 80:80 --rm -d ypd04208625/kub-demo-frontend 
+
+# 프론트엔드 화면에서 작동이 안됌
+# Ensure CORS response header values are valid
+# 브라우저가 task-api가 안전한지 모름, task-api setHeader 내용 추가 후 이미지 제작 및 적용
+
+# task-deployment.yaml 파일을 변경되지 않았기 때문에 기존 deployment를 제거하고 다시 apply
+
+-------------------------------------------------------------
+
+# 프론트엔드 어플리케이션도 K8S에 배포하기
+# frontend-deployment.yaml, frontend-serivce.yaml 생성 및 적용
+minikube service frontend-serivce
+
+# frontend 어플리케이션에서 task-api를 요청하는 주소를
+# K8S 서비스명.네임스페이스명으로 변경해도됌
+# 혹은 리버스 프록시를 구현해도됌
+
+# frontend/conf 파일의 nginx.conf 파일을 수정하여 
+# 리버스 프록시 구현 및 어플리케이션 수정
+
+# frontend 어플리케이션 수정 시 nginx.conf의 proxy pass
+# 를 http://tasks-service.default:8000/로 수정 
